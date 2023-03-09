@@ -1,0 +1,96 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="container">
+  <h1 class="text-center">{{ group.name }}</h1>
+  {% for intermediary, last_watered in plants %}
+  <div class="plant-block p-3 mb-3">
+    <div class="row align-items-center">
+      <div class="col-md-3">
+        <div class="font-weight-bold mb-2">{{ intermediary.plant.name }}</div>
+        <div class="plant-watering-frequency mb-2">
+          <i class="fas fa-tint"></i> Needs to be watered once in {{
+          intermediary.plant.watering_frequency }} days
+        </div>
+        <img
+          src="{{ intermediary.plant.picture }}"
+          alt="{{ intermediary.plant.name }}"
+          class="img-fluid plant-picture"
+        />
+      </div>
+      <div class="col-md-9">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="plant-water-status mb-2">
+              {% if last_watered == "No watering data" %}
+              <div class="plant-watering-overdue">
+                <i class="fas fa-exclamation-triangle"></i> Never watered
+              </div>
+              {% else %} {% set days_since_last_watering = (current_date -
+              last_watered).days %} {% set days_until_next_watering =
+              intermediary.plant.watering_frequency - days_since_last_watering
+              %} {% if days_since_last_watering == 0 %}
+              <div class="plant-watered-today">
+                <i class="fas fa-tint"></i> Plant watered today
+              </div>
+              {% elif days_since_last_watering >
+              intermediary.plant.watering_frequency %}
+              <div class="plant-watering-overdue">
+                <i class="fas fa-exclamation-triangle"></i> Watering overdue by
+                {{ days_since_last_watering -
+                intermediary.plant.watering_frequency }} days
+              </div>
+              {% else %}
+              <div class="plant-next-watering">
+                <i class="fas fa-clock"></i> Days until next watering: {{
+                days_until_next_watering }}
+              </div>
+              {% endif %} {% endif %}
+            </div>
+            <form
+              method="GET"
+              action="{{ url_for('plants.plant_single_edit', plant_id=intermediary.plant.id) }}"
+            >
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-edit"></i> View Plant
+              </button>
+            </form>
+          </div>
+          <div class="col-md-6">
+            <div class="plant-comment-form">
+              <form method="POST" action="{{ url_for('plants.update_plant') }}">
+                <input
+                  type="hidden"
+                  name="plant_id"
+                  value="{{ intermediary.plant.id }}"
+                />
+                <input
+                  type="hidden"
+                  name="group_id"
+                  value="{{ intermediary.plant_group_id }}"
+                />
+                <textarea
+                  name="comment"
+                  class="form-control mb-2"
+                  placeholder="Add a comment..."
+                >
+{{ last_watered.comment if last_watered else "" }}</textarea
+                >
+                <input
+                  type="date"
+                  name="watering_date"
+                  class="form-control mb-2"
+                  value="{{ current_date.strftime('%Y-%m-%d') }}"
+                />
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> Update
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

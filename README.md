@@ -1,25 +1,74 @@
-# BillSplit6
+# Plant App
 
-How to run:  
-$ python3 -m venv auth  
-$ . auth/Scripts/activate (for windows)  
-$ . auth/bin/activate (for ubuntu)  
-$ pip install -r requirements.txt  
-$ export FLASK_APP=project  
-$ flask run
+## How to Run
 
-tou can use these credentials to test:  
-id:  
-asas@gmail.com
+To run the app locally, follow these steps:
 
-pass:  
-asasas
+1. Create a virtual environment: `python3 -m venv auth`
+2. Activate the virtual environment:
+   - For Windows: `. auth/Scripts/activate`
+   - For Ubuntu: `. auth/bin/activate`
+3. Install the requirements: `pip install -r requirements.txt`
+4. Set the `FLASK_APP` environment variable: `export FLASK_APP=project`
+5. Run the app: `flask run`
+6. (Optional) Update the `requirements.txt` file with any new packages: `pip freeze > requirements.txt`
 
-Groups db:
+## Flask DB Migration
 
-![image](https://user-images.githubusercontent.com/26854208/214595857-e6de2c11-5436-47a6-88a2-bd5c1a0af89b.png)
+To perform a Flask database migration, follow these steps:
 
-CSS Bulma
+1. Make sure the Flask-Migrate package is installed: pip install Flask-Migrate
+2. Create a migration repository: flask db init
+3. Create a migration script: flask db migrate -m "migration message"
+4. Upgrade the database: flask db upgrade
+5. To downgrade the database, run flask db downgrade with the name of the revision to downgrade to.
 
-root  
-image.png
+## Credentials
+
+You can use these credentials to test:
+
+- Email: asas@gmail.com
+- Password: asasas
+
+## Groups Database
+
+![image](https://i.imgur.com/C1xxeJH.png)
+
+## Styles Used
+
+- CSS Bulma
+- CSS Bootstrap
+
+## Technologies Used
+
+- JWT token
+- SQLAlchemy
+- Werkzeug
+- Jinja2
+
+## Plant App
+
+### Features
+
+- Create, delete, and edit plant groups
+- Assign plant groups to friends to share and track plants
+- Add, remove, and edit plants and their characteristics
+- Upload pictures for plants (not currently viewable)
+- Track the watering history of individual plants
+- Remove last watering entry if entered accidentally
+- Pre-select today's date when watering plants, but select a custom date in the calendar
+
+## Department Project Management App
+
+### Features
+
+- Create, delete, and edit departments
+- Create, delete, and edit projects
+- Assign projects to departments and vice versa
+- Prepopulate information if the project is already assigned to a department and vice versa
+
+## Bill Split App
+
+### Features
+
+- Enter expenses and split them among friends

@@ -1,67 +1,104 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import login_required, login_user, logout_user
-from werkzeug.security import check_password_hash, generate_password_hash
+import datetime
+from functools import wraps
 
-from . import db
-from .models import User
+import jwt
+from flask import (Blueprint, Response, flash, jsonify, redirect,
+                   render_template, request, url_for)
+from flask_login import current_user, login_required, login_user, logout_user
+from werkzeug.urls import url_parse
 
-auth = Blueprint('auth', __name__)
+from .forms import LoginForm, RegistrationForm
+from .models import User, db
 
-@auth.route('/login')
-def login():
-    return render_template('login.html')
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-@auth.route('/login', methods=['POST'])
-def login_post():
-    # login code goes here
-    email = request.form.get('email')
-    password = request.form.get('password')
-    remember = True if request.form.get('remember') else False
+# JWT token configuration
+JWT_SECRET_KEY = 'jwt-secret-key-goes-here'
+JWT_EXPIRATION_DELTA = datetime.timedelta(days=1)
 
-    user = User.query.filter_by(email=email).first()
+def jwt_required(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        token = None
 
-    # check if the user actually exists
-    # take the user-supplied password, hash it, and compare it to the hashed password in the database
-    if not user or not check_password_hash(user.password, password):
-        flash('Please check your login details and try again.')
-        return redirect(url_for('auth.login')) # if the user doesn't exist or password is wrong, reload the page
+        if 'Authorization' in request.headers:
+            parts = request.headers['Authorization'].split()
+            if len(parts) == 2 and parts[0] == 'Bearer':
+                token = parts[1]
 
-    # if the above check passes, then we know the user has the right credentials
-    login_user(user, remember=remember)
-    return redirect(url_for('main.profile'))
+        if not token:
+            token = request.cookies.get('jwt_token')
+
+        if not token:
+            return Response('Authorization token is missing.', status=401)
+
+        try:
+            data = jwt.decode(token, JWT_SECRET_KEY, algorithms=['HS256'])
+            current_user = User.query.get(data['user_id'])
+        except:
+            return Response('Authorization token is invalid.', status=401)
+
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 
 
-@auth.route('/signup')
+@auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
-    return render_template('signup.html')
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
 
-@auth.route('/signup', methods=['POST'])
-def signup_post():
-    # code to validate and add user to database goes here
-    email = request.form.get('email')
-    name = request.form.get('name')
-    password = request.form.get('password')
+        # Check if username or email already exist
+        if User.query.filter_by(email=email).first() is not None:
+            flash('Email already registered')
+            return redirect(url_for('auth.signup'))
 
-    user = User.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
-    if user: # if a user is found, we want to redirect back to signup page so user can try again
-        flash('Email address already exists')
-        return redirect(url_for('auth.signup'))
-        
-    
-    
-    # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-    new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
+        # Add new user to database
+        user = User(email=email, name=username)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
 
-    # add the new user to the database
-    db.session.add(new_user)
-    db.session.commit()
+        flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('auth.login'))
 
-    return redirect(url_for('auth.login'))
+    return render_template('signup.html', title='Sign Up', form=form)
 
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
 
-@auth.route('/logout')
+        # Check if email is registered and password is correct
+        user = User.query.filter_by(email=email).first()
+        if user is None or not user.check_password(password):
+            flash('Invalid email or password')
+            return redirect(url_for('auth.login'))
+
+        # Log user in and generate JWT token
+        login_user(user, remember=form.remember_me.data)
+        payload = {
+            'user_id': user.id,
+            'exp': datetime.datetime.utcnow() + JWT_EXPIRATION_DELTA
+        }
+        jwt_token_bytes = jwt.encode(payload, JWT_SECRET_KEY, algorithm='HS256')
+        jwt_token_str = jwt_token_bytes
+
+        response = redirect(url_for('main.index'))
+        response.set_cookie('jwt_token', jwt_token_str, httponly=True, secure=True)
+        flash('You have been logged in')
+        return response
+
+    return render_template('login.html', title='Sign In', form=form)
+
+@auth_bp.route('/logout')
 @login_required
 def logout():
     logout_user()

@@ -9,6 +9,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
   </head>
 
   <body>
@@ -22,14 +26,41 @@
                   Home
                 </a>
                 {% if current_user.is_authenticated %}
-
                 <a href="{{ url_for('main.profile') }}" class="navbar-item">
                   Profile
                 </a>
+
                 <a href="{{ url_for('main.groups') }}" class="navbar-item">
-                  Groups
+                  Bill Splitter
                 </a>
-                {% endif %} {% if not current_user.is_authenticated %}
+                <a
+                  href="{{ url_for('departments.list_departments') }}"
+                  class="navbar-item"
+                >
+                  Departments
+                </a>
+                <a
+                  href="{{ url_for('departments.projects') }}"
+                  class="navbar-item"
+                >
+                  Projects
+                </a>
+                <a
+                  href="{{ url_for('plants.plant_groups') }}"
+                  class="navbar-item"
+                >
+                  Plant Groups
+                </a>
+                {% if current_user.is_authenticated %}
+                <a
+                  href="{{ url_for('plants.create_plant') }}"
+                  class="navbar-item"
+                >
+                  Create Plant
+                </a>
+
+                {% endif %} {% endif %} {% if not current_user.is_authenticated
+                %}
                 <a href="{{ url_for('auth.login') }}" class="navbar-item">
                   Login
                 </a>

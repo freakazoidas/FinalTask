@@ -1,0 +1,148 @@
+{% extends "base.html" %} {% block content %}
+<div>
+  <h1>Edit Plant</h1>
+
+  <form method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="plant_name">Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="plant_name"
+        name="plant_name"
+        value="{{ plant.name }}"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="plant_type">Type</label>
+      <input
+        type="text"
+        class="form-control"
+        id="plant_type"
+        name="plant_type"
+        value="{{ plant.type }}"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="watering_frequency">Watering Frequency (in days)</label>
+      <input
+        type="number"
+        class="form-control"
+        id="watering_frequency"
+        name="watering_frequency"
+        value="{{ plant.watering_frequency }}"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="replanting_frequency">Replanting Frequency (in months)</label>
+      <input
+        type="number"
+        class="form-control"
+        id="replanting_frequency"
+        name="replanting_frequency"
+        value="{{ plant.replanting_frequency }}"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="fertilization_frequency"
+        >Fertilization Frequency (in weeks)</label
+      >
+      <input
+        type="number"
+        class="form-control"
+        id="fertilization_frequency"
+        name="fertilization_frequency"
+        value="{{ plant.fertilizations_frequency }}"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="plant_picture">Picture</label>
+      {% if plant and plant.picture %}
+      <div class="mt-3 mb-3">
+        <img
+          src="{{ url_for('static', filename=plant.picture) }}"
+          alt="{{ plant.name }}"
+          style="max-height: 300px"
+        />
+      </div>
+      {% else %}
+      <p>Currently no picture</p>
+      {% endif %}
+
+      <div class="input-group">
+        <div class="custom-file">
+          <input
+            type="file"
+            class="custom-file-input"
+            id="plant_picture"
+            name="plant_picture"
+          />
+          <label class="custom-file-label" for="plant_picture"
+            >Choose file</label
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="plant_group">Group</label>
+      <select class="form-control" id="plant_group" name="plant_group">
+        {% for group in groups %} {% if group.id in group_ids %}
+        <option value="{{ group.id }}" selected>{{ group.name }}</option>
+        {% else %}
+        <option value="{{ group.id }}">{{ group.name }}</option>
+        {% endif %} {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Plant</button>
+  </form>
+
+  <form
+    method="POST"
+    class="mt-4"
+    onsubmit="return confirm('Are you sure you want to delete this plant?');"
+  >
+    <input type="hidden" name="_method" value="DELETE" />
+    <button type="submit" class="btn btn-danger">Delete Plant</button>
+  </form>
+</div>
+<div class="d-flex justify-content-center">
+  {% if plant.watering_history %}
+  <h2>Watering History</h2>
+  <table class="table mx-auto">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Comment</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in plant.watering_history %}
+      <tr>
+        <td>{{ entry.date }}</td>
+        <td>{{ entry.comment }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <form
+    method="POST"
+    action="{{ url_for('plants.clear_last_entry', plant_id=plant.id) }}"
+    class="mt-4"
+    onsubmit="return confirm('Are you sure you want to delete the last watering history entry for this plant?');"
+  >
+    <input type="hidden" name="_method" value="DELETE" />
+    <button type="submit" class="btn btn-danger">Clear Last Entry</button>
+  </form>
+  {% else %}
+  <p>Plant has not been watered yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

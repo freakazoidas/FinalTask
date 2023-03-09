@@ -1,44 +1,34 @@
-{% extends "base.html" %} {% block content %}
-<div class="column is-4 is-offset-4">
-  <h3 class="title">Login</h3>
-  <div class="box">
-    {% with messages = get_flashed_messages() %} {% if messages %}
-    <div class="notification is-danger">{{ messages[0] }}</div>
-    {% endif %} {% endwith %}
-
-    <form method="POST" action="/login">
+{% extends 'base.html' %} {% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title">Login</h1>
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      {{ form.hidden_tag() }}
       <div class="field">
-        <div class="control">
-          <input
-            class="input is-large"
-            type="email"
-            name="email"
-            placeholder="Your Email"
-            autofocus=""
-          />
-        </div>
+        {{ form.email.label() }}
+        <div class="control has-text-centered">{{ form.email() }}</div>
+        {% for error in form.email.errors %}
+        <p class="help is-danger">{{ error }}</p>
+        {% endfor %}
       </div>
-
       <div class="field">
-        <div class="control">
-          <input
-            class="input is-large"
-            type="password"
-            name="password"
-            placeholder="Your Password"
-          />
+        {{ form.password.label() }}
+        <div class="control has-text-centered">{{ form.password() }}</div>
+        {% for error in form.password.errors %}
+        <p class="help is-danger">{{ error }}</p>
+        {% endfor %}
+      </div>
+      <div class="field">
+        <div class="control has-text-centered">
+          {{ form.remember_me() }} {{ form.remember_me.label() }}
         </div>
       </div>
       <div class="field">
-        <label class="checkbox">
-          <input type="checkbox" name="remember" />
-          Remember me
-        </label>
+        <div class="control has-text-centered">
+          <button class="button is-primary" type="submit">Sign In</button>
+        </div>
       </div>
-      <button class="button is-block is-info is-large is-fullwidth">
-        Login
-      </button>
     </form>
   </div>
-</div>
+</section>
 {% endblock %}

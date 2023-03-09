@@ -1,0 +1,79 @@
+{% extends 'base.html' %} {% block content %}
+<div class="columns">
+  <div class="column is-one-third">
+    <h1 class="title">Departments</h1>
+    <form method="post" action="{{ url_for('departments.list_departments') }}">
+      <div class="field">
+        <label class="label">New Department</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            name="department_name"
+            placeholder="Enter department name"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <div class="control">
+          <button class="button is-primary" type="submit">Create</button>
+        </div>
+      </div>
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <div class="notification is-danger">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+    </form>
+  </div>
+  <div class="column">
+    <h2 class="subtitle">All Departments</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Department Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for department in departments %}
+        <span
+          id="department-name-{{ department.id }}-hidden"
+          style="display: none"
+        >
+          {{ department.department_name }}
+        </span>
+        <tr>
+          <td>{{ department.department_name }}</td>
+          <td>
+            <div class="buttons">
+              <a
+                href="{{ url_for('departments.department', department_id=department.id) }}"
+                class="button is-link"
+                >View</a
+              >
+
+              <a
+                href="{{ url_for('departments.edit_department', department_id=department.id) }}"
+                class="button is-warning"
+                >Edit</a
+              >
+
+              <form
+                action="{{ url_for('departments.delete_department', department_id=department.id) }}"
+                method="POST"
+              >
+                <button type="submit" class="button is-danger">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

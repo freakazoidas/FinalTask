@@ -1,0 +1,111 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container">
+  <h1 class="text-center mb-5">Create New Plant</h1>
+  <form method="POST" enctype="multipart/form-data">
+    <div class="row">
+      <div class="col-md-8 mx-auto">
+        <table class="table">
+          <tbody>
+            <tr>
+              <th scope="row">Plant Name</th>
+              <td>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="plant_name"
+                  name="plant_name"
+                  required
+                />
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Plant Type</th>
+              <td>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="plant_type"
+                  name="plant_type"
+                  required
+                />
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Plant Pictures</th>
+              <td>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="plant_pictures"
+                  name="plant_pictures"
+                />
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Watering Frequency (days)</th>
+              <td>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="watering_frequency"
+                  name="watering_frequency"
+                  required
+                  min="0"
+                />
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Replanting Frequency (days)</th>
+              <td>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="replanting_frequency"
+                  name="replanting_frequency"
+                  value="365"
+                  min="0"
+                />
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Fertilization Frequency (days)</th>
+              <td>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="fertilization_frequency"
+                  name="fertilization_frequency"
+                  value="365"
+                  min="0"
+                />
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Assign Group</th>
+              <td>
+                <select class="form-select" id="group_id" name="group_id">
+                  {% for group in plant_groups %}
+                  <option value="{{ group.id }}">{{ group.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary">Create</button>
+    </div>
+  </form>
+
+  {% if plant_picture %}
+  <div class="row mt-5">
+    <div class="col-md-6 mx-auto">
+      <img src="{{ plant_picture }}" alt="Plant Picture" class="img-fluid" />
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %} {% block content %}
+<div class="columns">
+  <div class="column is-three-quarters">
+    <h1 class="title is-3 has-text-centered">
+      {{ department.department_name }}
+    </h1>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="container">
+      {% for category, message in messages %}
+      <div
+        class="notification is-{{ category }} has-text-white has-background-info"
+      >
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Project Name</th>
+          <th>Description</th>
+          <th>Picture</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for project in projects %}
+        <tr>
+          <td>{{ project.project_name }}</td>
+          <td>{{ project.project_description }}</td>
+          <td>
+            {% if project.project_picture %}
+            <img
+              src="{{ url_for('static', filename='images/' + project.project_picture) }}"
+              alt="{{ project.project_name }} picture"
+            />
+            {% endif %}
+            <img alt="{{ project.project_name }}" width="100px" />
+          </td>
+          <td>
+            <form
+              method="post"
+              action="{{ url_for('departments.remove_project', department_id=department.id, project_id=project.id) }}"
+            >
+              <button type="submit" class="button is-danger">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="box">
+      <h2 class="title is-4">Assign Project</h2>
+      <form
+        method="post"
+        action="{{ url_for('departments.assign_project', department_id=department.id) }}"
+      >
+        <div class="field">
+          <label class="label">Project</label>
+          <div class="control">
+            <div class="select">
+              <select name="project_id">
+                <option value="">Choose a project...</option>
+                {% for project in available_projects %}
+                <option value="{{ project.id }}">
+                  {{ project.project_name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <button type="submit" class="button is-primary">
+              Assign Project
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

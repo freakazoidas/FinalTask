@@ -1,0 +1,93 @@
+{% extends 'base.html' %} {% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title">Edit Project</h1>
+
+    <form
+      method="POST"
+      action="{{ url_for('departments.project', project_id=project.id) }}"
+      enctype="multipart/form-data"
+    >
+      <div class="field">
+        <label class="label">Project Name</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            name="project_name"
+            value="{{ project.project_name }}"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Project Description</label>
+        <div class="control">
+          <textarea class="textarea" name="project_description" required>
+{{ project.project_description }}</textarea
+          >
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Departments</label>
+        <div class="control">
+          {% for department in departments %}
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              name="department_ids"
+              value="{{ department.id }}"
+              {%
+              if
+              department.id
+              in
+              assigned_departments
+              %}
+              checked
+              {%
+              endif
+              %}
+            />
+            {{ department.department_name }}
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Project Picture</label>
+        <div class="control">
+          <input class="input" type="file" name="project_picture" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Current Project Picture</label>
+        <div class="control">
+          {% if project.project_picture %}
+          <img
+            src="{{ url_for('static', filename='images/' + project.project_picture) }}"
+            alt="{{ project.project_name }}"
+          />
+          {% else %}
+          <p>No picture available.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="field is-grouped">
+        <div class="control">
+          <button class="button is-link" type="submit">Update Project</button>
+        </div>
+        <div class="control">
+          <a class="button is-text" href="{{ url_for('departments.projects') }}"
+            >Cancel</a
+          >
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

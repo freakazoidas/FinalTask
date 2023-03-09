@@ -1,0 +1,36 @@
+{% extends 'base.html' %} {% block content %}
+<div class="columns">
+  <div class="column is-one-third">
+    <h1 class="title">Edit Department</h1>
+    <form
+      method="post"
+      action="{{ url_for('departments.edit_department', department_id=department.id) }}"
+    >
+      <div class="field">
+        <label class="label">Department Name</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            name="department_name"
+            value="{{ department.department_name }}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <div class="control">
+          <button class="button is-primary" type="submit">Save</button>
+        </div>
+      </div>
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <div class="notification is-danger">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+    </form>
+  </div>
+</div>
+
+{% endblock %}
